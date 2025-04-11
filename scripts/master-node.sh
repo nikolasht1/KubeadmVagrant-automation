@@ -45,6 +45,9 @@ if [[ "$NODENAME" == "master-node" ]]; then
 
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
+    # Create file with token
+    kubeadm token create --print-join-command > /vagrant/joincluster.sh
+
 else
 
     echo "not apropriate node-name!"
