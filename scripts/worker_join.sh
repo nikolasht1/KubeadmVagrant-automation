@@ -1,6 +1,6 @@
 #!/bin/bash
 
 sudo su
-
-cp -b /vagrant/joincluster.sh ~/
-bash ~/joincluster.sh
+echo "run script worker_join"
+#cp -b /vagrant/joincluster.sh ~/
+#bash ~/joincluster.sh
