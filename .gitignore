@@ -3,3 +3,5 @@
 **/.vagrant/*
 /joincluster.sh
 joincluster.sh
+/config
+config

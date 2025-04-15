@@ -41,6 +41,10 @@ if [[ "$NODENAME" == "master-node" ]]; then
     sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
     sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
 
+    # copy config to host machine
+
+    sudo cp -i "$HOME"/.kube/config /vagrant
+
     # Install Claico Network Plugin Network 
 
     kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
