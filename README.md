@@ -5,6 +5,6 @@ Automated Vagrant script to raise K8s cluster
 - clone repository.
 - run command:
         vagrant up
-- You have now k8s cluster with two worker-node and one master-node.
+- You have now k8s cluster with two worker-nodes and one master-node.
 - To clean up run command:
         vagrant destroy --force        
