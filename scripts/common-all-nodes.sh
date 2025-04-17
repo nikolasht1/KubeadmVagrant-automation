@@ -38,24 +38,41 @@ sudo sysctl --system
 sudo apt-get update -y
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
-# Install CRI-O Runtime
+# Install Docker Runtime
 sudo apt-get update -y
 sudo apt-get install -y software-properties-common curl apt-transport-https ca-certificates
 
-curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key |
-    gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+#Add the Docker GPG key and apt repository
 
-echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/ /" |
-    tee /etc/apt/sources.list.d/cri-o.list
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+#Install the Docker community edition
 
 sudo apt-get update -y
-sudo apt-get install -y cri-o
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+#Add the docker daemon configurations to use systemd as the cgroup driver
+
+cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable crio --now
-sudo systemctl start crio.service
+sudo systemctl enable docker --now
+sudo systemctl start docker.service
 
-echo "CRI runtime installed successfully"
+echo "Docker runtime installed successfully"
 
 # Install kubelet, kubectl, and kubeadm
 curl -fsSL https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/Release.key |
