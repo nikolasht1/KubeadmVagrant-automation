@@ -10,6 +10,8 @@ set -euxo pipefail
 PUBLIC_IP_ACCESS="false"
 NODENAME=$(hostname -s)
 POD_CIDR="192.168.0.0/16"
+MASTER_PRIVATE_IP=$(ip addr show eth1 | awk '/inet / {print $2}' | cut -d/ -f1)
+MASTER_PUBLIC_IP=$(curl checkip.amazonaws.com && echo "")
 
 # Check node name
 if [[ "$NODENAME" == "master-node" ]]; then
@@ -17,9 +19,9 @@ if [[ "$NODENAME" == "master-node" ]]; then
     # Pull required images
 
     sudo kubeadm config images pull
-
+    sudo kubeadm init --apiserver-advertise-address=$MASTER_PRIVATE_IP  --apiserver-cert-extra-sans=$MASTER_PRIVATE_IP  --pod-network-cidr=$POD_CIDR --node-name $NODENAME  --ignore-preflight-errors Swap --v=5
     # Initialize kubeadm based on PUBLIC_IP_ACCESS
-
+<<comment
     if [[ "$PUBLIC_IP_ACCESS" == "false" ]]; then
         
         MASTER_PRIVATE_IP=$(ip addr show eth1 | awk '/inet / {print $2}' | cut -d/ -f1)
@@ -34,7 +36,7 @@ if [[ "$NODENAME" == "master-node" ]]; then
         echo "Error: MASTER_PUBLIC_IP has an invalid value: $PUBLIC_IP_ACCESS"
         exit 1
     fi
-
+comment
     # Configure kubeconfig
 
     mkdir -p "$HOME"/.kube
